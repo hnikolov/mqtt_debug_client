@@ -1,0 +1,485 @@
+
+<!DOCTYPE html>
+<!--******************************************************************************* -->
+<!-- Copyright (c) 2015 IBM Corp.                                                   -->
+<!--                                                                                -->
+<!-- All rights reserved. This program and the accompanying materials               -->
+<!-- are made available under the terms of the Eclipse Public License v1.0          -->
+<!-- and Eclipse Distribution License v1.0 which accompany this distribution.       -->
+<!--                                                                                -->
+<!-- The Eclipse Public License is available at                                     -->
+<!--    http://www.eclipse.org/legal/epl-v10.html                                   -->
+<!-- and the Eclipse Distribution License is available at                           -->
+<!--   http://www.eclipse.org/org/documents/edl-v10.php.                            -->
+<!--                                                                                -->
+<!-- Contributors:                                                                  -->
+<!--    James Sutton - Initial Contribution                                         -->
+<!--    Hristo Nikolov - Modifications towards "my home mqtt"                     -->
+<!--******************************************************************************* -->
+<html>
+
+<head>
+  <title>My Home MQTT JavaScript Client</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+  <!-- Custom Styles theme -->
+  <link rel="stylesheet" href="style.css">
+  
+  <script type = "text/javascript" src = "http://canvasjs.com/assets/script/canvasjs.min.js" >  </script>
+
+</head>
+
+<body onload="onload()">
+  <div class="container">
+    <!-- Nav Bar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+              <img alt="Paho" src="paho-small-logo.png">
+            </a>
+            <span class="navbar-brand">Javascript Client Utility</span>
+          </div>
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="https://www.eclipse.org/paho/clients/js/" target="_blank">Paho Project</a>
+            </li>
+            <li>
+              <a href="http://www.eclipse.org/paho/files/jsdoc/index.html" target="_blank">Documentation</a>
+            </li>
+            <li>
+              <a href="http://git.eclipse.org/c/paho/org.eclipse.paho.mqtt.javascript.git/" target="_blank">Repository</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav> <!-- Nav Bar End -->
+    
+    <div class="row">
+      <div class="col-md-12">
+        <!-- Connection panel -->
+        <div class="panel panel-default">
+        
+          <div class="panel-heading"> 
+            <a class="chevron-toggle" data-toggle="collapse" data-target="#serverCollapse" href="#collapseOne" id="connectionStatus"> Connection - Disconnected. </a>
+          </div>
+          
+          <div class="panel-body collapse in" id="serverCollapse">
+            <form>
+              <div class="row">
+
+                <div class="col-lg-5">
+                  <div class="form-group">
+                    <label for="hostInput">Host</label>
+<!--                    <input type="text" class="form-control" id="hostInput" value="192.168.2.100"> -->
+                    <input type="text" class="form-control" id="hostInput" value="iot.eclipse.org">                    
+                  </div>
+                </div>
+                
+                <div class="col-lg-1">
+                  <div class="form-group">
+                    <label for="portInput">Port</label>
+<!--                    <input type="text" class="form-control" id="portInput" value="9001"> -->
+                    <input type="text" class="form-control" id="portInput" value="80">
+                  </div>
+                </div>
+                
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="clientIdInput">Client ID</label>
+                    <input type="text" class="form-control" id="clientIdInput" value="javascript-client">
+                  </div>
+                </div>
+                
+                <div class="col-lg-1">
+                  <div class="form-group">
+                    <label for="clientConnectButton"></label>
+                    <a id="clientConnectButton" class="btn btn-default" onclick="connectionToggle();">Connect</a>
+                  </div>
+                </div>
+                
+              </div>
+              
+              <div class="row">
+
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="pathInput">Path</label>
+                    <input type="text" class="form-control" id="pathInput" value="/ws">
+                  </div>
+                </div>
+                
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="userInput">Username</label>
+                    <input type="text" class="form-control" id="userInput">
+                  </div>
+                </div>
+
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="passInput">Password</label>
+                    <input type="password" class="form-control" id="passInput">
+                  </div>
+                </div>
+
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="keepAliveInput">Keep-Alive</label>
+                    <input type="text" class="form-control" id="keepAliveInput" value="60">
+                  </div>
+                </div>
+
+                <div class="col-lg-1">
+                  <div class="form-group">
+                    <label for="timeoutInput">Timeout</label>
+                    <input type="text" class="form-control" id="timeoutInput" value="3">
+                  </div>
+                </div>
+
+                <div class="col-lg-1">
+                  <div class="form-group">
+                    <label for="sslInput">SSL</label>
+                    <input type="checkbox" class="special-checkbox" id="sslInput" value="">
+                  </div>
+                </div>
+                
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="cleanSessionInput">Clean Session</label>
+                    <input type="checkbox" class="special-checkbox" id="cleanSessionInput" value="">
+                  </div>
+                </div>
+                
+              </div>
+              
+              <div class="row">
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label for="lwtInput">Last Will Topic</label>
+                    <input type="text" class="form-control" id="lwtInput">
+                  </div>
+                </div>
+
+                <div class="col-lg-1">
+                  <div class="form-group">
+                    <label for="lwQosInput">QoS</label>
+                    <select class="form-control" id="lwQosInput">
+                      <option>0</option>
+                      <option>1</option>
+                      <option>2</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-lg-1">
+                  <div class="form-group">
+                    <label for="lwRetainInput">Retain</label>
+                    <input type="checkbox" class="special-checkbox" id="lwRetainInput" value="">
+                  </div>
+                </div>
+                <div class="col-lg-7">
+                  <div class="form-group">
+                    <label for="lwMInput">Last Will Message</label>
+                    <textarea class="form-control" id="lwMInput" rows="3"></textarea>
+                  </div>
+                </div>
+              </div>
+              
+            </form>
+          </div>
+        </div> <!-- End of Connection panel -->
+        
+        <!-- Sub/Pub panel -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+            
+              <div class="panel-heading"> 
+                <a class="chevron-toggle" data-toggle="collapse" data-target="#pubsubCollapse" href="#collapseOne"> Subscribe/Publish </a>
+              </div>
+              
+              <div class="panel-body collapse in" id="pubsubCollapse">                    
+                <div class="row">
+                  <!-- Subscription panel -->
+                  <div class="col-md-6">
+                    <div class="panel panel-default">     
+                      <div class="panel-heading"> Subscribe </div>
+                      
+                      <div class="panel-body" id="subscribeCollapse">
+                
+                        <form class="form-horizontal">
+                      
+                          <div class="form-group">
+                            <label for="subscribeTopicInput" class="col-sm-2 control-label">Topic</label>                  
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="subscribeTopicInput" value="power_meter/#" disabled>
+                            </div>
+                          </div>
+                        
+                          <div class="form-group">
+                            <label for="subscribeQosInput" class="col-sm-2 control-label">QoS</label>
+                            <div class="col-sm-10">
+                              <select class="form-control" id="subscribeQosInput" disabled>
+                                <option>0</option>
+                                <option>1</option>
+                                <option>2</option>
+                              </select>
+                            </div>
+                          </div>
+                        
+                          <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                              <button id="subscribeButton" type="button" class="btn btn-default" onclick="subscribe();" disabled>Subscribe</button>
+                              <button id="unsubscribeButton" type="button" class="btn btn-default" onclick="unsubscribe();" disabled>Unsubscribe</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div> <!-- End of Subscription panel -->
+                    
+                  <!-- Publish panel -->
+                  <div class="col-md-6">
+                    <div class="panel panel-default">     
+                      <div class="panel-heading"> Publish Message </div>
+                    
+                      <div class="panel-body" id="publishCollapse">
+                        <form >
+                          <div class="row">
+                        
+                          <div class="col-lg-5">
+                            <div class="form-group">
+                              <label for="publishTopicInput">Topic</label>
+                              <input type="text" class="form-control" id="publishTopicInput" value="power_meter/" disabled>
+                            </div>
+                          </div>
+                          
+                          <div class="col-lg-3">
+                            <div class="form-group">
+                              <label for="publishQosInput">QoS</label>
+                              <select class="form-control" id="publishQosInput" disabled>
+                                <option>0</option>
+                                <option>1</option>
+                                <option>2</option>
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-lg-1">
+                            <div class="form-group">
+                              <label for="publishRetainInput">Retain</label>
+                              <input type="checkbox" class="special-checkbox" id="publishRetainInput" value="" disabled>
+                            </div>
+                          </div>
+                          
+                          <div class="col-lg-1">
+                            <div class="form-group">
+                              <label for="publishButton">&nbsp </label>
+                              <button id="publishButton" type="button" class="btn btn-default" onclick="publish();" disabled>Publish</a>
+                            </div>
+                          </div>
+                
+                        </div>
+                
+                          <div class="row">
+                            <div class="col-lg-12">
+                              <div class="form-group">
+                                <label for="publishMessageInput">Message</label>
+                                <textarea class="form-control" id="publishMessageInput" rows="1"> </textarea>
+                              </div>
+                            </div>
+                          </div>
+                        
+                        </form>
+                      </div>
+                    </div>
+                  </div> <!-- End of Publish panel -->      
+                </div>
+              </div> <!-- End of class="panel-body -->
+            </div>
+          </div>
+        </div>
+      
+        <!-- Operation panel -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+
+              <div class="panel-heading" id="heading_op">Operational</div>
+              
+              <div class="panel-body" id="operational">
+   	            <table class="table table-hover table-condensed" id="operational_table">
+<!--                  <caption id="tbl_cap">&nbsp;&nbsp;<img src="img/off-line4.png" height="16"/>&nbsp;&nbsp;&nbsp;power_meter/ID93305</caption>-->
+                  <tbody>
+                    <tr id="row_t">
+                      <td style="width:25px;">
+                        <a class="chevron-toggle" data-toggle="collapse" data-target="#tCollapse" href="#collapseOne">
+                          <img src="img/thermometer2.png" height="22"/> 
+                        </a>
+                      </td>
+                      <td style="width:60px; font-weight:bold;" align="right" id="value_t">23.45</td>
+                      <td style="width:50px;" align="left"><font color="gray">&deg;C</font></td>
+<!--                      <td class="collapse in" id="tCollapse"><div id="chartContainer_t" style="height: 100px; width: 100%;"></div></td>-->
+                      <td align="right"></td>
+                    </tr>
+                  </tbody>               
+                  <tbody class="collapse in" id="tCollapse">
+                    <tr><td colspan="4"><div id="chartContainer_t" style="height: 200px; width: 100%;"></div></td></tr>
+                  </tbody> 
+                  
+                  <tbody>
+                    <tr id="row_e">
+                      <td style="width:25px;">
+                        <a class="chevron-toggle" data-toggle="collapse" data-target="#eCollapse" href="#collapseOne">
+                          <img src="img/plug1.png" height="22"/> 
+                        </a>
+                      </td>
+<!--                      <td style="width:25px;"><img src="img/plug1.png" height="22"/></td> -->
+                      <td style="width:60px; font-weight:bold;" align="right" id="value_e">0.97</td>
+                      <td style="width:50px;" align="left"><font color="gray">kW/h</font></td>
+<!--                      <td> <a class="chevron-toggle" data-toggle="collapse" data-target="#eCollapse" href="#collapseOne">show</a></td> -->
+                      <td align="right"></td> 
+                    </tr>
+                  </tbody>
+                  <tbody class="collapse in" id="eCollapse">
+                    <tr><td colspan="4"><div id="chartContainer_e" style="height: 200px; width: 100%;"></div></td></tr>
+                  </tbody> 
+                  
+                  <tbody>
+                    <tr id="row_w">
+                      <td style="width:25px;">
+                        <a class="chevron-toggle" data-toggle="collapse" data-target="#wCollapse" href="#collapseOne">
+                          <img src="img/tap-water1.jpg" height="22"/> 
+                        </a>
+                      </td>                    
+<!--                      <td style="width:25px;"><img src="img/tap-water1.jpg" height="22"/></td> -->
+                      <td style="width:60px; font-weight:bold;" align="right">189</td>
+                      <td style="width:50px;" align="left"><font color="gray">Litres</font></td>
+                      <td align="right"></td> 
+                    </tr>
+                  </tbody>
+                  <tbody class="collapse in" id="wCollapse">                  
+                    <tr><td colspan="4"><div id="chartContainer_w" style="height: 100px; width: 100%;"></div></td></tr>
+                  </tbody> 
+                  
+                  <tbody>
+                    <tr id="row_g">
+                      <td style="width:25px;">
+                        <a class="chevron-toggle" data-toggle="collapse" data-target="#gCollapse" href="#collapseOne">
+                          <img src="img/gas.png" height="22"/> 
+                        </a>
+                      </td>                    
+<!--                      <td style="width:25px;"><img src="img/gas.png" height="22"/></td> -->
+                      <td style="width:60px; font-weight:bold;" align="right">123.45</td>
+                      <td style="width:50px;" align="left"><font color="gray">m&sup3;</font></td>
+                      <td align="right"></td> 
+                    </tr>
+                  </tbody>
+                  <tbody class="collapse in" id="gCollapse">                  
+                    <tr><td colspan="4"><div id="chartContainer_g" style="height: 100px; width: 100%;"></div></td></tr>
+                  </tbody>
+                  
+                </table>
+              </div>
+              
+            </div> 
+          </div> <!-- End of Operation panel -->
+        </div> <!-- End of class="row" -->
+
+        <!-- Last Messages panel -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+          
+              <div class="panel-heading">
+                <a class="chevron-toggle" data-toggle="collapse" data-target="#subscriptionsCollapse" href="#collapseOne"> Last Messages </a>
+              </div>
+            
+              <div class="panel-body collapse in fixed-height-panel" id="subscriptionsCollapse">
+                <table class="table table-hover table-condensed tableSection" id="lastMessageTable">
+                  <thead>
+                    <tr>
+                      <th>Topic</th>
+                      <th>Payload</th>
+                      <th>Time</th>
+                      <th>QoS</th>
+                    </tr>
+                  </thead>
+                  <tbody> </tbody>
+                </table>
+              </div>
+			
+            </div> 
+          </div> <!-- End of Last Messages panel -->
+        </div> <!-- End of class="row" -->
+        
+        <!-- History panel -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+            
+              <div class="panel-heading">
+                <a class="chevron-toggle" data-toggle="collapse" data-target="#historyCollapse" href="#collapseOne"> History </a>
+              </div>
+              
+              <div class="panel-body collapse in fixed-height-panel" id="historyCollapse">
+                <span class="right"><a href="#" onclick="clearHistory()">Clear History</a></span>
+                
+                <table class="table table-hover table-condensed  tableSection" id="incomingMessageTable">
+                  <thead>
+                    <tr>
+                      <th>Topic</th>
+                      <th>Payload</th>
+                      <th>Time</th>
+                      <th>Qos</th>
+                    </tr>
+                  </thead>
+                  <tbody> </tbody>
+                </table>
+              </div>
+     
+            </div>
+          </div> <!-- End of History panel -->
+        </div> <!-- End of class="row" -->
+     
+ 
+        <!-- Weather panel -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+            
+              <div class="panel-heading"> 
+                <a class="chevron-toggle" data-toggle="collapse" data-target="#weatherCollapse" href="#collapseOne"> Weather </a>
+              </div>
+              
+              <div class="panel-body collapse in" id="weatherCollapse">                  
+                <iframe id="forecast_embed" type="text/html" frameborder="0" height="265" width="100%" src="weather_frame.html"> </iframe>
+              </div>
+    
+            </div>
+          </div> <!-- End of Weather panel -->
+        </div> <!-- End of class="row" -->
+<!--
+                <iframe name="forecast_embed_1" id="forecast_embed_1" type="text/html" frameborder="0" height="245" width="100%" src="http://forecast.io/embed/#lat=51.9995&lon=4.3627&name=Delft&color=#0088ff&text-color=#666666&font=Georgia&units=si"> </iframe>
+                <input type="button" onclick="document.frames('forecast_embed_1').location.reload();" value="reload iFrame...">
+-->        
+      </div> <!-- End of class="col-md-12" -->
+    </div> <!-- End of class="row" -->
+  </div> <!-- End of class="container" -->
+
+  
+  <!-- Source Paho MQTT Client-->
+  <script src="./mqtt/mqttws31.js"> </script>
+  <!--<script src="./mqtt/mqttws31-min.js"> </script>-->
+
+  <!-- Utility Javascript -->
+  <script src="./utility.js"> </script>
+  
+  <!-- Javascript used for Bootstrap Theme -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  
+</body>
+</html>
